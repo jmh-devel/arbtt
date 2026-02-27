@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+branch="$(git rev-parse --abbrev-ref HEAD)"
+
+if [[ "${branch}" == "master" ]]; then
+    echo "Push blocked: do not push 'master' to origin. Keep it as upstream parity branch." >&2
+    echo "Push 'main' (or feature branches) to origin instead." >&2
+    exit 1
+fi
+
+if ! git remote get-url upstream >/dev/null 2>&1; then
+    exit 0
+fi
+
+if [[ "${branch}" != "main" && "${ARBTT_SYNC_ENFORCE_ALL:-0}" != "1" ]]; then
+    exit 0
+fi
+
+git fetch --quiet upstream --prune
+
+if git show-ref --verify --quiet "refs/remotes/upstream/master"; then
+    upstream_ref="upstream/master"
+elif git show-ref --verify --quiet "refs/remotes/upstream/main"; then
+    upstream_ref="upstream/main"
+else
+    exit 0
+fi
+
+read -r ahead behind < <(git rev-list --left-right --count "HEAD...${upstream_ref}")
+
+if [[ "${behind}" -gt 0 ]]; then
+    if [[ "${ARBTT_AUTO_SYNC_ON_PUSH:-0}" == "1" ]]; then
+        echo "Auto-sync enabled; rebasing before push..." >&2
+        scripts/git-sync-upstream.sh
+    else
+        echo "Push blocked: branch is behind ${upstream_ref} (ahead=${ahead}, behind=${behind})." >&2
+        echo "Run: scripts/git-sync-upstream.sh --push" >&2
+        echo "Or set ARBTT_AUTO_SYNC_ON_PUSH=1 to auto-sync during push." >&2
+        exit 1
+    fi
+fi

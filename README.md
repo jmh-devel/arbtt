@@ -70,6 +70,57 @@ latest source at the git repository at
 
 The issue tracker is hosted on GitHub: <https://github.com/nomeata/arbtt/issues>
 
+Fork/shim workflow for downstream maintenance
+-------------------------------------------
+
+When maintaining a downstream copy while keeping commit parity with upstream,
+use this repository as a rebase-first shim:
+
+1. Keep remotes split as:
+  - `upstream`: `git@github.com:nomeata/arbtt`
+  - `origin`: your fork (for example `git@github.com:jmh-devel/arbtt.git`)
+2. Reserve `master` as a read-only parity branch for upstream:
+
+     git checkout master
+     git fetch upstream --prune
+     git reset --hard upstream/master
+
+   Never commit to `master`.
+
+3. Do all local development on `main`:
+
+     git checkout -B main master
+     git push -u origin main
+
+4. Before integrating local work, run:
+
+     scripts/git-sync-upstream.sh
+
+  This fetches upstream, moves local `master` to upstream parity,
+  and rebases your current branch (`main` or feature branch) onto `master`.
+5. To sync and publish in one step, run:
+
+     scripts/git-sync-upstream.sh --push
+
+6. Install repository hooks once per clone:
+
+     scripts/setup-dev-git-hooks.sh
+
+  The hooks block commits on `master`, block pushes from `master`, and block
+  commit/push on `main` if it is behind upstream parity.
+
+7. Use repository lint/format scripts for shell and git hooks:
+
+     scripts/lint.sh
+     scripts/format.sh
+
+  `pre-commit` runs `scripts/lint.sh --staged` automatically.
+  Required tools: `shellcheck` and `shfmt`.
+
+By default, sync checks enforce this on `main` and protect `master` from
+local divergence. To enforce sync checks on all branches, set
+`ARBTT_SYNC_ENFORCE_ALL=1` in your shell.
+
 User and Developer discussion happens on the arbtt mailing list, `arbtt@lists.nomeata.de`.
 To subscribe to the list, visit <http://lists.nomeata.de/mailman/listinfo/arbtt>.
 

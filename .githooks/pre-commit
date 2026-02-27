@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+branch="$(git rev-parse --abbrev-ref HEAD)"
+
+if [[ "${branch}" == "master" ]]; then
+    echo "Commit blocked: 'master' is reserved for upstream parity only." >&2
+    echo "Create/switch to 'main' (or a feature branch off main) to commit changes." >&2
+    exit 1
+fi
+
+if ! git remote get-url upstream >/dev/null 2>&1; then
+    exit 0
+fi
+
+if [[ "${branch}" != "main" && "${ARBTT_SYNC_ENFORCE_ALL:-0}" != "1" ]]; then
+    exit 0
+fi
+
+git fetch --quiet upstream --prune
+
+if git show-ref --verify --quiet "refs/remotes/upstream/master"; then
+    upstream_ref="upstream/master"
+elif git show-ref --verify --quiet "refs/remotes/upstream/main"; then
+    upstream_ref="upstream/main"
+else
+    exit 0
+fi
+
+read -r ahead behind < <(git rev-list --left-right --count "HEAD...${upstream_ref}")
+
+if [[ "${behind}" -gt 0 ]]; then
+    echo "Commit blocked: branch is behind ${upstream_ref} (ahead=${ahead}, behind=${behind})." >&2
+    echo "Run: scripts/git-sync-upstream.sh" >&2
+    exit 1
+fi
+
+if [[ -x scripts/lint.sh ]]; then
+    scripts/lint.sh --staged
+fi

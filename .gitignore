@@ -2,3 +2,19 @@ doc/arbtt.pdf
 doc/man/
 doc/users_guide/
 .stack-work
+dist/
+dist-newstyle/
+bin/
+
+# Cabal / GHC local artifacts
+cabal.project.local
+cabal.project.local~
+.ghc.environment.*
+
+# Editors / OS
+.DS_Store
+*.swp
+*.swo
+
+# Local helper artifacts
+page-bg.png
