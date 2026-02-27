@@ -1,0 +1,23 @@
+Source: arbtt
+Section: utils
+Priority: optional
+Maintainer: jmh-devel <joel@tacitsoft.dev>
+Build-Depends:
+ debhelper-compat (= 13),
+ cabal-install,
+ ghc,
+ pkg-config,
+ libpcre3-dev,
+ libx11-dev,
+ libxext-dev
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+Homepage: http://arbtt.nomeata.de/
+
+Package: arbtt
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: Automatic Rule-Based Time Tracker
+ arbtt records active window titles and related desktop activity over time.
+ It includes tools to capture logs and derive statistics from customizable
+ categorization rules.

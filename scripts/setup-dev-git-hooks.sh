@@ -20,6 +20,6 @@ if git show-ref --verify --quiet refs/heads/main; then
     fi
 fi
 
-chmod +x scripts/git-sync-upstream.sh scripts/setup-dev-git-hooks.sh scripts/lint.sh scripts/format.sh scripts/haskell-lint.sh scripts/haskell-format.sh .githooks/pre-commit .githooks/pre-push
+chmod +x scripts/git-sync-upstream.sh scripts/setup-dev-git-hooks.sh scripts/lint.sh scripts/format.sh scripts/haskell-lint.sh scripts/haskell-format.sh scripts/deb-install-deps.sh scripts/deb-build.sh .githooks/pre-commit .githooks/pre-push
 
 echo "Configured hooks, rebase defaults, branch upstream tracking (when available), and executable bits."

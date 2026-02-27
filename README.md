@@ -147,6 +147,28 @@ Some of my plans or ideas include:
 Any help cleaning, documenting or testing the current code is appreciated
 as well.
 
+Debian package quickstart (Ubuntu 25.04)
+----------------------------------------
+
+This repository now includes a Debian packaging scaffold for fast local
+`.deb` builds on Ubuntu `DISTRIB_RELEASE=25.04`.
+
+1. Install packaging dependencies:
+
+  scripts/deb-install-deps.sh
+
+2. Build package artifacts:
+
+  scripts/deb-build.sh
+
+3. Install locally for testing (from repository parent directory):
+
+  sudo apt install ../arbtt_*_amd64.deb
+
+Notes:
+- Current stage targets Debian/Ubuntu packaging only.
+- RPM/Red Hat packaging is intentionally deferred.
+
 Creating the Windows Installer
 ------------------------------
 

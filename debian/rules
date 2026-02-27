@@ -1,0 +1,37 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	cabal v2-configure
+
+override_dh_auto_build:
+	cabal v2-build \
+		exe:arbtt-capture \
+		exe:arbtt-stats \
+		exe:arbtt-dump \
+		exe:arbtt-import \
+		exe:arbtt-recover
+
+override_dh_auto_test:
+	cabal v2-test test --test-show-details=direct
+
+override_dh_auto_install:
+	install -d debian/arbtt/usr/bin
+	install -m 0755 "$$(cabal list-bin exe:arbtt-capture)" debian/arbtt/usr/bin/arbtt-capture
+	install -m 0755 "$$(cabal list-bin exe:arbtt-stats)" debian/arbtt/usr/bin/arbtt-stats
+	install -m 0755 "$$(cabal list-bin exe:arbtt-dump)" debian/arbtt/usr/bin/arbtt-dump
+	install -m 0755 "$$(cabal list-bin exe:arbtt-import)" debian/arbtt/usr/bin/arbtt-import
+	install -m 0755 "$$(cabal list-bin exe:arbtt-recover)" debian/arbtt/usr/bin/arbtt-recover
+
+	install -d debian/arbtt/usr/share/applications
+	install -m 0644 arbtt-capture.desktop debian/arbtt/usr/share/applications/arbtt-capture.desktop
+
+	install -d debian/arbtt/usr/share/man/man1
+	install -m 0644 doc/man/man1/*.1 debian/arbtt/usr/share/man/man1/
+
+	install -d debian/arbtt/usr/share/doc/arbtt/examples
+	install -m 0644 categorize.cfg debian/arbtt/usr/share/doc/arbtt/examples/categorize.cfg
