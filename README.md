@@ -161,13 +161,23 @@ This repository now includes a Debian packaging scaffold for fast local
 
   scripts/deb-build.sh
 
-3. Install locally for testing (from repository parent directory):
+3. Artifacts are placed in:
 
-  sudo apt install ../arbtt_*_amd64.deb
+  build/artifacts/debian/ubuntu/plucky/amd64/<version>/
+  build/artifacts/debian/ubuntu/plucky/amd64/latest/
+
+  This structure is intended to be CD-friendly for later sync/publish to
+  external package storage (for example, S3-backed repositories).
+
+4. Install locally for testing:
+
+  sudo apt install build/artifacts/debian/ubuntu/plucky/amd64/latest/arbtt_*_amd64.deb
 
 Notes:
 - Current stage targets Debian/Ubuntu packaging only.
 - RPM/Red Hat packaging is intentionally deferred.
+- PR builds to `main` run in GitHub Actions and upload `build/artifacts/debian/**`
+  as workflow artifacts for later CD handoff.
 
 Creating the Windows Installer
 ------------------------------

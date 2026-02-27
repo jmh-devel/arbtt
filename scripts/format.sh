@@ -21,5 +21,9 @@ shfmt -w -i 4 -ci "${files[@]}"
 echo "Formatted ${#files[@]} files."
 
 if [[ -x scripts/haskell-format.sh ]]; then
-    scripts/haskell-format.sh
+    if command -v fourmolu >/dev/null 2>&1 || command -v ormolu >/dev/null 2>&1; then
+        scripts/haskell-format.sh
+    else
+        echo "Skipping Haskell format (install fourmolu or ormolu to enable)."
+    fi
 fi

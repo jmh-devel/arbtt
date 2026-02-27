@@ -7,8 +7,18 @@ if ! command -v apt-get >/dev/null 2>&1; then
     exit 1
 fi
 
-sudo apt-get update
-sudo apt-get install -y \
+if command -v sudo >/dev/null 2>&1; then
+    if sudo -n true >/dev/null 2>&1; then
+        SUDO="sudo -n"
+    else
+        SUDO="sudo"
+    fi
+else
+    SUDO=""
+fi
+
+${SUDO} apt-get update
+${SUDO} apt-get install -y \
     build-essential \
     cabal-install \
     debhelper \
