@@ -11,29 +11,27 @@ if [[ "${branch}" == "master" ]]; then
 fi
 
 if ! git remote get-url upstream >/dev/null 2>&1; then
-    exit 0
-fi
+    :
+elif [[ "${branch}" == "main" || "${ARBTT_SYNC_ENFORCE_ALL:-0}" == "1" ]]; then
+    git fetch --quiet upstream --prune
 
-if [[ "${branch}" != "main" && "${ARBTT_SYNC_ENFORCE_ALL:-0}" != "1" ]]; then
-    exit 0
-fi
+    if git show-ref --verify --quiet "refs/remotes/upstream/master"; then
+        upstream_ref="upstream/master"
+    elif git show-ref --verify --quiet "refs/remotes/upstream/main"; then
+        upstream_ref="upstream/main"
+    else
+        upstream_ref=""
+    fi
 
-git fetch --quiet upstream --prune
+    if [[ -n "${upstream_ref}" ]]; then
+        read -r ahead behind < <(git rev-list --left-right --count "HEAD...${upstream_ref}")
 
-if git show-ref --verify --quiet "refs/remotes/upstream/master"; then
-    upstream_ref="upstream/master"
-elif git show-ref --verify --quiet "refs/remotes/upstream/main"; then
-    upstream_ref="upstream/main"
-else
-    exit 0
-fi
-
-read -r ahead behind < <(git rev-list --left-right --count "HEAD...${upstream_ref}")
-
-if [[ "${behind}" -gt 0 ]]; then
-    echo "Commit blocked: branch is behind ${upstream_ref} (ahead=${ahead}, behind=${behind})." >&2
-    echo "Run: scripts/git-sync-upstream.sh" >&2
-    exit 1
+        if [[ "${behind}" -gt 0 ]]; then
+            echo "Commit blocked: branch is behind ${upstream_ref} (ahead=${ahead}, behind=${behind})." >&2
+            echo "Run: scripts/git-sync-upstream.sh" >&2
+            exit 1
+        fi
+    fi
 fi
 
 if [[ -x scripts/lint.sh ]]; then

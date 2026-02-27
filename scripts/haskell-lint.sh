@@ -16,7 +16,7 @@ collect_staged_files() {
         if [[ -z "${file}" ]]; then
             continue
         fi
-        if [[ "${file}" == scripts/*.sh || "${file}" == .githooks/* ]]; then
+        if [[ "${file}" == *.hs || "${file}" == *.hsc ]]; then
             if [[ -f "${file}" ]]; then
                 echo "${file}"
             fi
@@ -25,13 +25,10 @@ collect_staged_files() {
 }
 
 collect_all_files() {
-    find scripts .githooks -type f \( -name "*.sh" -o -path ".githooks/*" \) | sort
+    find src tests -type f \( -name "*.hs" -o -name "*.hsc" \) | sort
 }
 
 main() {
-    require_tool shellcheck
-    require_tool shfmt
-
     local mode="${1:-}"
     local files=()
 
@@ -46,20 +43,16 @@ main() {
     fi
 
     if [[ "${#files[@]}" -eq 0 ]]; then
-        echo "No matching shell/hook files to lint."
-    else
-        echo "Running shfmt check..."
-        shfmt -d -i 4 -ci "${files[@]}"
-
-        echo "Running shellcheck..."
-        shellcheck "${files[@]}"
-
-        echo "Shell lint checks passed."
+        echo "No matching Haskell files to lint."
+        exit 0
     fi
 
-    if [[ -x scripts/haskell-lint.sh ]]; then
-        scripts/haskell-lint.sh "${mode}"
-    fi
+    require_tool hlint
+
+    echo "Running hlint..."
+    hlint "${files[@]}"
+
+    echo "Haskell lint checks passed."
 }
 
 main "$@"

@@ -19,3 +19,7 @@ fi
 
 shfmt -w -i 4 -ci "${files[@]}"
 echo "Formatted ${#files[@]} files."
+
+if [[ -x scripts/haskell-format.sh ]]; then
+    scripts/haskell-format.sh
+fi

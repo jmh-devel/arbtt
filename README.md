@@ -115,7 +115,10 @@ use this repository as a rebase-first shim:
      scripts/format.sh
 
   `pre-commit` runs `scripts/lint.sh --staged` automatically.
-  Required tools: `shellcheck` and `shfmt`.
+  Required tools:
+  - shell/hook: `shellcheck`, `shfmt`
+  - Haskell lint: `hlint`
+  - Haskell format: `fourmolu` (preferred) or `ormolu`
 
 By default, sync checks enforce this on `main` and protect `master` from
 local divergence. To enforce sync checks on all branches, set
