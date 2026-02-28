@@ -120,7 +120,7 @@ HEADER_RE = re.compile(
 )
 CURRENT_DESKTOP_RE = re.compile(r'^\s+Current Desktop: (.+)$')
 WINDOW_RE = re.compile(
-    r'^\s+(\(..\)) \[([^\]]+)\]\s+([^:]+):\s+(.*)$'
+    r'^\s+(\(.\)) \[([^\]]+)\]\s+([^:]+):\s+(.*)$'
 )
 
 
